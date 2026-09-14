@@ -1,25 +1,30 @@
 import streamlit as st
 import yfinance as yf
+import pandas as pd
 
-st.set_page_config(page_title="Entry Bot")
 st.title("Entry Bot - Gold 0.10 | NAS 0.05")
 
-market = st.selectbox("Market", ["Gold XAUUSD", "NAS100", "EURUSD"])
-tickers = {"Gold XAUUSD": "GC=F", "NAS100": "NQ=F", "EURUSD": "EURUSD=X"}
-lot = 0.05 if "NAS" in market else 0.10
+market = st.selectbox("Market", ["Gold XAUUSD", "NAS100"])
+symbol = "GC=F" if "Gold" in market else "^NDX"
+lots = 0.10 if "Gold" in market else 0.05
 
-ticker = tickers[market]
-data = yf.download(ticker, period="2d", interval="5m", progress=False)
+try:
+    data = yf.download(symbol, period="5d", interval="1h", progress=False, auto_adjust=True)
+    if data is None or len(data) == 0:
+        st.warning("Market data loading... refresh page")
+        st.stop()
 
-if len(data) > 20:
-    close = float(data['Close'].iloc[-1])
-    high_break = float(data['High'].rolling(20).max().iloc[-2])
-    low_break = float(data['Low'].rolling(20).min().iloc[-2])
-    st.metric("Price", f"{close:.2f}", f"Lot {lot}")
-    st.line_chart(data['Close'].tail(100))
-    if close > high_break:
-        st.success(f"BUY LIMIT {high_break:.2f} | Lot {lot}")
-    elif close < low_break:
-        st.error(f"SELL LIMIT {low_break:.2f} | Lot {lot}")
-    else:
-        st.info(f"WAITING - Lot {lot}")
+    col = 'Close' if 'Close' in data.columns else data.columns[-1]
+    closes = data[col]
+    close_price = float(closes.iloc[-1])
+    ma = float(closes.rolling(20).mean().iloc[-1]) if len(closes) > 20 else close_price
+    signal = "BUY" if close_price > ma else "SELL"
+
+    st.metric("Price", f"{close_price:.2f}")
+    st.metric("Signal", signal)
+    st.write(f"Lot size: {lots}")
+    st.line_chart(closes.tail(50))
+
+except Exception as e:
+    st.error("Loading... click Refresh. Market may be closed.")
+    st.write(str(e))
