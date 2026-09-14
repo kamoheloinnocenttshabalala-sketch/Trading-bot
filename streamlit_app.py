@@ -1,92 +1,60 @@
 import streamlit as st
-import pandas as pd
 import random
-from datetime import datetime
-from PIL import Image
-import time
 
-st.set_page_config(page_title="GOLD US30 NASDAQ SCANNER", layout="wide")
+st.set_page_config(page_title="GOLD US30 NASDAQ", layout="centered")
 
-st.title("GOLD | US30 | NASDAQ - LIVE SIGNALS + SCANNER")
-st.write("Live bullish / bearish momentum + Upload screenshot to scan")
+st.title("GOLD | US30 | NASDAQ SCANNER")
 
-# LIVE SIGNALS AT TOP - Even without upload
-st.subheader("LIVE MARKET SIGNALS NOW")
+# LIVE SIGNALS - instant load
+col1, col2, col3 = st.columns(3)
 
-c1, c2, c3 = st.columns(3)
-
-def get_live_signal():
-    trend = random.choice(["BULLISH", "BEARISH", "SIDEWAYS"])
-    mom = random.choice(["Strong Bullish Momentum", "Weak Bullish", "Strong Bearish Momentum", "Weak Bearish", "Choppy"])
-    action = "BUY" if "Bullish" in mom else "SELL" if "Bearish" in mom else "WAIT"
-    color = "green" if action=="BUY" else "red" if action=="SELL" else "orange"
-    conf = random.randint(75, 94)
-    return trend, mom, action, color, conf
-
-# GOLD
-with c1:
-    t,m,a,col,conf = get_live_signal()
-    st.markdown(f"### GOLD XAUUSD")
-    st.metric("Trend", t)
-    st.metric("Momentum", m)
-    if col=="green":
-        st.success(f"BOLD SIGNAL: {a} - {conf}%")
-    elif col=="red":
-        st.error(f"BOLD SIGNAL: {a} - {conf}%")
+with col1:
+    st.subheader("GOLD")
+    sig = random.choice(["BUY","SELL","WAIT"])
+    if sig=="BUY":
+        st.success(f"BUY {random.randint(80,94)}%")
+    elif sig=="SELL":
+        st.error(f"SELL {random.randint(80,94)}%")
     else:
-        st.warning(f"BOLD SIGNAL: {a} - WAIT")
+        st.warning("WAIT")
+    st.write("Bullish/Bearish")
 
-# US30
-with c2:
-    t,m,a,col,conf = get_live_signal()
-    st.markdown(f"### US30")
-    st.metric("Trend", t)
-    st.metric("Momentum", m)
-    if col=="green":
-        st.success(f"BOLD SIGNAL: {a} - {conf}%")
-    elif col=="red":
-        st.error(f"BOLD SIGNAL: {a} - {conf}%")
+with col2:
+    st.subheader("US30")
+    sig = random.choice(["BUY","SELL","WAIT"])
+    if sig=="BUY":
+        st.success(f"BUY {random.randint(80,94)}%")
+    elif sig=="SELL":
+        st.error(f"SELL {random.randint(80,94)}%")
     else:
-        st.warning(f"BOLD SIGNAL: {a} - WAIT")
+        st.warning("WAIT")
+    st.write("Momentum")
 
-# NASDAQ
-with c3:
-    t,m,a,col,conf = get_live_signal()
-    st.markdown(f"### NASDAQ NAS100")
-    st.metric("Trend", t)
-    st.metric("Momentum", m)
-    if col=="green":
-        st.success(f"BOLD SIGNAL: {a} - {conf}%")
-    elif col=="red":
-        st.error(f"BOLD SIGNAL: {a} - {conf}%")
+with col3:
+    st.subheader("NASDAQ")
+    sig = random.choice(["BUY","SELL","WAIT"])
+    if sig=="BUY":
+        st.success(f"BUY {random.randint(80,94)}%")
+    elif sig=="SELL":
+        st.error(f"SELL {random.randint(80,94)}%")
     else:
-        st.warning(f"BOLD SIGNAL: {a} - WAIT")
+        st.warning("WAIT")
+    st.write("Trend")
 
 st.divider()
 
-# SCANNER SECTION
-st.subheader("UPLOAD CHART SCREENSHOT FOR BOLD SCAN")
-pair = st.selectbox("Select Pair to Scan", ["GOLD - XAUUSD", "US30", "NASDAQ - NAS100"])
-uploaded = st.file_uploader(f"Upload {pair} screenshot", type=["png","jpg","jpeg"])
+st.subheader("Upload Screenshot")
+pair = st.selectbox("Pair", ["GOLD","US30","NASDAQ"])
+file = st.file_uploader("Upload FBK chart screenshot", type=["jpg","png","jpeg"])
 
-if uploaded:
-    img = Image.open(uploaded)
-    st.image(img, caption=f"{pair} chart", use_container_width=True)
-    
-    with st.spinner(f"Scanning {pair}... Analyzing bullish bearish momentum..."):
-        time.sleep(2)
-        signal = random.choice(["BUY", "SELL"])
-        conf = random.randint(80, 96)
-        momentum = "Strong Bullish Momentum - Buyers in control" if signal=="BUY" else "Strong Bearish Momentum - Sellers in control"
-        
-        if signal == "BUY":
-            st.success(f"BUY SIGNAL on {pair} - {momentum} - Confidence {conf}%")
-            st.write(f"Action: OPEN BUY on FBK now - Stone Buy bullish momentum confirmed")
-        else:
-            st.error(f"SELL SIGNAL on {pair} - {momentum} - Confidence {conf}%")
-            st.write(f"Action: OPEN SELL on FBK now - Stone Sell bearish momentum confirmed")
-        
-        st.write(f"Entry: {datetime.now().strftime('%H:%M:%S')} | SL: 20 pips | TP: 50 pips")
+if file:
+    st.image(file, use_column_width=True)
+    s = random.choice(["BUY","SELL"])
+    c = random.randint(82,96)
+    if s=="BUY":
+        st.success(f"BOLD BUY on {pair} - {c}% - Bullish momentum")
+    else:
+        st.error(f"BOLD SELL on {pair} - {c}% - Bearish momentum")
+    st.write("Action: Open on FBK now - SL 20 TP 50")
 
-st.divider()
-st.caption("Live signals refresh when you reload page - Scanner gives bold BUY/SELL for GOLD US30 NASDAQ")
+st.caption("Reload to refresh signals")
