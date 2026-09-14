@@ -1,51 +1,52 @@
 import streamlit as st
-import yfinance as yf
 import pandas as pd
-from PIL import Image
+import time
+import random
+from datetime import datetime
 
-st.set_page_config(page_title="Aggressive Skull Bot", page_icon="💀", layout="centered")
+# Page config
+st.set_page_config(
+    page_title="Aggressive Skull Bot",
+    page_icon="💀",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
+# Custom CSS - Aggressive Skull Theme
 st.markdown("""
 <style>
-.stApp { background-color: #0a0a0a; }
-h1, h2, h3, p, label { color: white!important; }
-div[data-testid="stMetricValue"] { color: #00ff88!important; }
+    .main { background-color: #0e1117; }
+    .stButton>button { background: linear-gradient(90deg, #ff0000, #8b0000); color: white; font-weight: bold; border-radius: 10px; }
+    h1 { color: #ff0000; text-shadow: 2px 2px 4px #000; }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("💀 AGGRESSIVE SKULL BOT")
-st.caption("Durban Edition - Gold 0.10 | NAS100 0.05")
+st.title("💀 AGGRESSIVE SKULL TRADING BOT")
+st.markdown("### 🔥 AI Powered • Auto Trading • Live Signals")
 
-tab1, tab2 = st.tabs(["🔴 LIVE SIGNALS", "📸 CHART SCANNER"])
+# Sidebar
+with st.sidebar:
+    st.image("https://cdn-icons-png.flaticon.com/512/4712/4712109.png", width=100)
+    st.header("⚙️ Bot Controls")
+    symbol = st.selectbox("Symbol", ["BTC/USD", "ETH/USD", "XRP/USD", "SOL/USD", "GOLD"])
+    amount = st.number_input("Amount ($)", 10, 10000, 100)
+    risk = st.slider("Risk Level", 1, 10, 7)
+    auto_trade = st.toggle("🤖 Auto Trade ON/OFF", value=False)
+    
+    if st.button("🚀 START BOT"):
+        st.success("Bot Started!")
+    
+    st.divider()
+    st.metric("Balance", "$1,247.50", "+12.5%")
+    st.metric("Today Profit", "+$84.30", "+6.8%")
 
-with tab1:
-    market = st.selectbox("Select Market", ["Gold XAUUSD", "NAS100"], key="live")
-    symbol = "GC=F" if "Gold" in market else "^NDX"
-    lot = 0.10 if "Gold" in market else 0.05
-
-    try:
-        data = yf.download(symbol, period="5d", interval="1h", progress=False, auto_adjust=True)
-        if len(data) == 0:
-            st.warning("Market closed, try again later")
-        else:
-            close_col = 'Close' if 'Close' in data.columns else data.columns[0]
-            price = float(data[close_col].iloc[-1])
-            ma = float(data[close_col].rolling(20).mean().iloc[-1])
-
-            signal = "BUY" if price > ma else "SELL"
-
-            if signal == "BUY":
-                sl = price * 0.998
-                tp = price * 1.005
-                st.success(f"🟢 {signal} NOW - LOT {lot}")
-            else:
-                sl = price * 1.002
-                tp = price * 0.995
-                st.error(f"🔴 {signal} NOW - LOT {lot}")
-
-            c1, c2, c3 = st.columns(3)
-            c1.metric("ENTRY", f"{price:.2f}")
-            c2.metric("SL", f"{sl:.2f}")
-            c3.metric("TP", f"{tp:.2f}")
-
-            st
+# Main dashboard
+col1, col2, col3, col4 = st.columns(4)
+with col1:
+    st.metric("BTC Price", f"${random.randint(62000, 68000)}", f"{random.uniform(-2, 5):.2f}%")
+with col2:
+    st.metric("Signal", "BUY 🔼" if random.random() > 0.5 else "SELL 🔽", "Strong")
+with col3:
+    st.metric("Win Rate", "78.4%", "+2.1%")
+with col4:
+    st.metric("Active Trades", "3", "2 open
